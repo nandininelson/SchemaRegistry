@@ -15,10 +15,8 @@ public class SimpleProducer {
         final Logger logger = LoggerFactory.getLogger(SimpleProducer.class.getName());
 
         // Section 1: command line arguments
-        // final String bootstrapServers = args[0]; //e.g: "127.0.0.1:9092"
-        // final String topic = args[1]; //e.g: "test_topic"
-        final String bootstrapServers =  "127.0.0.1:9092";
-        final String topic = "test_topic";
+        final String bootstrapServers = args[0]; //e.g: "127.0.0.1:9092"
+        final String topic = args[1]; //e.g: "test_topic"
 
         // Section 2: create Producer props
         Properties props = new Properties();
