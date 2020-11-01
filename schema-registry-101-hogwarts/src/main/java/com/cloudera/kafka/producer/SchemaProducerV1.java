@@ -1,28 +1,33 @@
 package com.cloudera.kafka.producer;
 
+// Section: Imports
+import com.cloudera.kafka.util.ConfigUtil;
 import org.apache.kafka.clients.producer.*;
-import org.apache.kafka.common.serialization.LongSerializer;
-import org.apache.kafka.common.serialization.StringSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import java.io.IOException;
 import java.util.Properties;
 
-public class ProducerWithSchemaSupportV1 {
+public class SchemaProducerV1 {
 
-    public static void main(String[] args) {
+    public static final Logger logger = LoggerFactory.getLogger(SchemaProducerV1.class.getName());
+    public static void main(String[] args) throws Exception {
+        if(args.length<1){
+            System.out.println("Configuration File Required.");
+            System.exit(-1);
+        }
+        String propertiesFile = args[0];
 
-        final Logger logger = LoggerFactory.getLogger(ProducerWithSchemaSupportV1.class.getName());
+        // Section 1: Get the configs from the properties file
+        final ConfigUtil configUtil = new ConfigUtil(propertiesFile);
 
-        // Section 1: command line arguments
-        // Section 1.0 : Client Mandatory configs
-        final String bootstrapServers = args[0]; //e.g: "127.0.0.1:9092"
-        final String topic = args[1]; //e.g: "test_topic"
-        // TODO: Section 1.1 : Schema Registry Configs
+        // Get arguments
+        final String bootstrapServers = configUtil.getProperties("bootstrap-server");
+        final String topic = configUtil.getProperties("topic");
 
-        // TODO: Section 1.2 : Schema Name
+        // TODO: Section 1.1 : Schema Registry Configs (Schema Registry URL and Schema Name)
 
-        // TODO: Section 1.11 : Security Configs
+        // TODO: Section 1.Secure : Security Configs
 
         // Section 2: create Producer props
         Properties props = new Properties();
@@ -33,7 +38,13 @@ public class ProducerWithSchemaSupportV1 {
 
         // TODO: Section 3: Create a SR Client
 
-        // TODO: Section 3.1: Get latest version of Schema
+        // TODO: Section 3.Secure : Security Configs
+        // TODO: Section 3.Secure.SSL
+        // TODO: Section 3.Secure.SASL
+        // TODO: Section 3.Secure.Knox
+
+
+        // TODO: Section 3.1: Get a specific version of Schema from SR
 
         // TODO: Section 3.2: Create schema
 

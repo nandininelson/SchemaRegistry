@@ -1,0 +1,28 @@
+{
+  "type": "record",
+  "name": "User",
+  "namespace": "com.example.avro",
+  "doc": "This is a user record. The schema is just a demo!",
+  "fields": [
+    {
+      "name": "id",
+      "doc": "User ID.",
+      "type": "int"
+    },
+    {
+      "name": "username",
+      "doc": "The username chosen by the user.",
+      "type": "string"
+    },
+    {
+      "name": "password",
+      "doc": "The user's password.",
+      "type": "string"
+    },
+    {
+      "name": "emailAddresses",
+      "doc": "All email addresses on the user's account",
+      "type": "string"
+    }
+  ]
+}

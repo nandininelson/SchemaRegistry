@@ -1,22 +1,30 @@
-package com.cloudera.kafka;
+package com.cloudera.kafka.producer;
 
+import com.cloudera.kafka.util.ConfigUtil;
 import org.apache.kafka.clients.producer.*;
 import org.apache.kafka.common.serialization.LongSerializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import java.io.IOException;
 import java.util.Properties;
 
 public class SimpleProducer {
 
-    public static void main(String[] args) {
+    public final static Logger logger = LoggerFactory.getLogger(SimpleProducer.class.getName());
+    public static void main(String[] args) throws Exception {
+        if(args.length<1){
+            System.out.println("Configuration File Required.");
+            System.exit(-1);
+        }
+        String propertiesFile = args[0];
 
-        final Logger logger = LoggerFactory.getLogger(SimpleProducer.class.getName());
+        // Section 1: Get the configs from the properties file
+        final ConfigUtil configUtil = new ConfigUtil(propertiesFile);
 
-        // Section 1: command line arguments
-        final String bootstrapServers = args[0]; //e.g: "127.0.0.1:9092"
-        final String topic = args[1]; //e.g: "test_topic"
+        // Get arguments
+        final String bootstrapServers = configUtil.getProperties("bootstrap-server");
+        final String topic = configUtil.getProperties("topic");
 
         // Section 2: create Producer props
         Properties props = new Properties();
@@ -42,13 +50,13 @@ public class SimpleProducer {
                         // executes every time a record is successfully sent or an exception is thrown
                         if (e == null) {
                             // the record was successfully sent
-                            logger.info("Received new metadata. \n" +
-                                    "Topic:" + recordMetadata.topic() + "\n" +
-                                    "Partition: " + recordMetadata.partition() + "\n" +
-                                    "Offset: " + recordMetadata.offset() + "\n" +
-                                    "Timestamp: " + recordMetadata.timestamp());
+                            System.out.println("Received new metadata." +
+                                    "Topic:" + recordMetadata.topic()  +
+                                    ", Partition: " + recordMetadata.partition()  +
+                                    ", Offset: " + recordMetadata.offset() +
+                                    ", Timestamp: " + recordMetadata.timestamp());
                         } else {
-                            logger.error("Error while producing", e);
+                            System.err.println("Error while producing" + e);
                         }
                     }
                 });
@@ -66,4 +74,5 @@ public class SimpleProducer {
             producer.close();
         }
     }
+
 }

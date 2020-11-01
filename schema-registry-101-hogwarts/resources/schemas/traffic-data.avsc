@@ -1,0 +1,10 @@
+{
+   "type" : "record",
+   "namespace" : "com.schema.trucking",
+   "name" : "TrafficData",
+   "fields" : [
+      { "name" : "eventTime" , "type" : "long" },
+      { "name" : "routeId" , "type" : "int" },
+      { "name" : "congestionLevel" , "type" : "int" }
+   ]
+}

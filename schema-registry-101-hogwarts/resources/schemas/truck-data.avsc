@@ -1,0 +1,18 @@
+{
+   "type" : "record",
+   "namespace" : "com.schema.trucking",
+   "namespace" : "com.schema.trucking",
+   "name" : "TruckData",
+   "fields" : [
+      { "name" : "eventTime" , "type" : "long" },
+      { "name" : "truckId" , "type" : "int" },
+      { "name" : "driverId" , "type" : "int" },
+      { "name" : "driverName" , "type" : "string" },
+      { "name" : "routeId" , "type" : "int" },
+      { "name" : "routeName" , "type" : "string" },
+      { "name" : "latitude" , "type" : "double" },
+      { "name" : "longitude" , "type" : "double" },
+      { "name" : "speed" , "type" : "int" },
+      { "name" : "eventType" , "type" : "string" }
+   ]
+}
