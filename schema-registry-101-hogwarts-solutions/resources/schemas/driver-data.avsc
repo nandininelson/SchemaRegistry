@@ -1,0 +1,38 @@
+{
+ "type": "record",
+ "name": "DriverData",
+ "namespace": "com.example.avro",
+ "doc": "This is a driver record.",
+ "fields": [
+  {
+   "name": "id",
+   "doc": "Driver ID.",
+   "type": "int"
+  },
+  {
+   "name": "Name",
+   "doc": "The full name of the driver.",
+   "type": "string"
+  },
+  {
+   "name": "dob",
+   "doc": "The driver's date of birth.",
+   "type": "string"
+  },
+  {
+   "name": "emailAddresses",
+   "doc": "Email addresses of the Driver",
+   "type": "string"
+  },
+  {
+   "name": "contactNumber",
+   "doc": "Contact number of the Driver",
+   "type": "long"
+  },
+  {
+   "name": "emergencyContact",
+   "doc": "Emergency contact number of the Driver",
+   "type": "long"
+  }
+ ]
+}
