@@ -3,32 +3,37 @@ package com.cloudera.kafka.sr101.solutions.nandini.producer;
 // Section: Imports
 
 import com.cloudera.kafka.util.ConfigUtil;
-
+import com.hortonworks.registries.schemaregistry.SchemaVersionInfo;
+import com.hortonworks.registries.schemaregistry.SchemaVersionKey;
+import com.hortonworks.registries.schemaregistry.client.SchemaRegistryClient;
+import com.hortonworks.registries.schemaregistry.serdes.avro.AbstractAvroSnapshotSerializer;
+import com.hortonworks.registries.schemaregistry.serdes.avro.kafka.KafkaAvroSerde;
+import com.hortonworks.registries.schemaregistry.serdes.avro.kafka.KafkaAvroSerializer;
+import org.apache.avro.Schema;
+import org.apache.avro.generic.GenericData;
+import org.apache.avro.generic.GenericRecord;
+import org.apache.kafka.clients.producer.*;
+import org.apache.kafka.common.serialization.LongSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Properties;
-import org.apache.kafka.clients.producer.*;
-import com.hortonworks.registries.schemaregistry.SchemaVersionKey;
-import com.hortonworks.registries.schemaregistry.serdes.avro.AbstractAvroSnapshotSerializer;
-import org.apache.kafka.common.serialization.LongSerializer;
-import com.hortonworks.registries.schemaregistry.serdes.avro.kafka.KafkaAvroSerializer;
-import com.hortonworks.registries.schemaregistry.client.SchemaRegistryClient;
-import com.hortonworks.registries.schemaregistry.SchemaVersionInfo;
-import org.apache.avro.Schema;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
+
 import static com.hortonworks.registries.schemaregistry.serdes.avro.SerDesProtocolHandlerRegistry.METADATA_ID_VERSION_PROTOCOL;
 
-import org.apache.avro.generic.GenericData;
-import org.apache.avro.generic.GenericRecord;
+public class SchemaProducerUser {
 
-public class SchemaProducerV1 {
-
-    public static final Logger logger = LoggerFactory.getLogger(SchemaProducerV1.class.getName());
+    public static final Logger logger = LoggerFactory.getLogger(SchemaProducerUser.class.getName());
     public static void main(String[] args) throws Exception {
-
-        String propertiesFile = "/Users/nandinin/Desktop/git/schema-registry-101-hogwarts/resources/configs/producer_device.properties";
+        /*if(args.length<1){
+            System.out.println("Configuration File Required.");
+            System.exit(-1);
+        }
+        String propertiesFile = args[0];
+        */
+        String propertiesFile = "/Users/nandinin/Desktop/git/schema-registry-101-hogwarts/resources/configs/producer_user.properties";
 
         // Section 1: Get the configs from the properties file
         final ConfigUtil configUtil = new ConfigUtil(propertiesFile);
@@ -58,6 +63,8 @@ public class SchemaProducerV1 {
         config.put(SchemaRegistryClient.Configuration.CLASSLOADER_CACHE_EXPIRY_INTERVAL_SECS.name(), 5000);
         config.put(SchemaRegistryClient.Configuration.SCHEMA_VERSION_CACHE_SIZE.name(), 1000);
         config.put(SchemaRegistryClient.Configuration.SCHEMA_VERSION_CACHE_EXPIRY_INTERVAL_SECS.name(), 60 * 60 * 1000);
+        config.put(KafkaAvroSerde.KEY_SCHEMA_VERSION_ID_HEADER_NAME, "key.schema.version.id");
+        config.put(KafkaAvroSerde.VALUE_SCHEMA_VERSION_ID_HEADER_NAME, "user");
 
         SchemaRegistryClient schemaRegistryClient = new SchemaRegistryClient(config);
         // TODO: Section 3.Secure : Security Configs
@@ -66,12 +73,15 @@ public class SchemaProducerV1 {
         // TODO: Section 3.Secure.Knox
 
 
-        // TODO: Section 3.1: Get a specific version of Schema from SR
-        SchemaVersionInfo schemaVersion = schemaRegistryClient.getSchemaVersionInfo(new SchemaVersionKey(SCHEMA_NAME,1/*SCHEMA_VERSION*/));
-        // TODO: Section 3.2: Create schema
-        String userSchema = schemaVersion.getSchemaText();
+        final String USER_SCHEMA = "{"
+                + "\"type\":\"record\","
+                + "\"name\":\"myrecord\","
+                + "\"fields\":["
+                + "  { \"name\":\"str1\", \"type\":\"string\" },"
+                + "  { \"name\":\"str2\", \"type\":\"string\" }"
+                + "]}";
         Schema.Parser parser = new Schema.Parser();
-        Schema schema = parser.parse(userSchema);
+        Schema schema = parser.parse(USER_SCHEMA);
         // TODO: Section 4: create the producer
         KafkaProducer<Long, Object> producer = new KafkaProducer<Long, Object>(props);
         // Section 5: create a producer record and send data asynchronously at an interval of 1 sec
@@ -81,10 +91,8 @@ public class SchemaProducerV1 {
                 // TODO: Section 5.1 create a Generic record
                 Long timestamp = System.currentTimeMillis();
                 GenericRecord avroRecord = new GenericData.Record(schema);
-                avroRecord.put("xid", 12345L);
-                avroRecord.put("name", "device12345");
-                avroRecord.put("version", 0);
-                avroRecord.put("timestamp", timestamp);
+                avroRecord.put("str1", "str1");
+                avroRecord.put("str2", "str2");
                 // TODO: Section 5.2 create a producer record
                 ProducerRecord<Long, Object > record = new ProducerRecord<Long, Object >(topic, timestamp, avroRecord);
                 // TODO: Section 5.3 sends data asynchronously
@@ -98,7 +106,6 @@ public class SchemaProducerV1 {
                                     ", Partition: " + recordMetadata.partition()  +
                                     ", Offset: " + recordMetadata.offset() +
                                     ", Timestamp: " + recordMetadata.timestamp() +
-                                    ", Schema Version: " + schemaVersion.getVersion() +
                                     ", Record: " + record.value());
                         } else {
                             System.err.println("Error while producing" + e);

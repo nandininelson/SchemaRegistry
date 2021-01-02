@@ -3,31 +3,33 @@ package com.cloudera.kafka.sr101.solutions.nandini.consumer;
 // Section: Imports
 
 import com.cloudera.kafka.util.ConfigUtil;
-
+import com.hortonworks.registries.schemaregistry.client.SchemaRegistryClient;
+import com.hortonworks.registries.schemaregistry.serdes.avro.kafka.KafkaAvroDeserializer;
 import com.hortonworks.registries.schemaregistry.serdes.avro.kafka.KafkaAvroSerde;
 import org.apache.avro.generic.GenericRecord;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.common.serialization.LongDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
-import java.util.*;
-
-import org.apache.kafka.clients.consumer.*;
-import org.apache.kafka.common.serialization.LongDeserializer;
-import com.hortonworks.registries.schemaregistry.serdes.avro.kafka.KafkaAvroDeserializer;
-import com.hortonworks.registries.schemaregistry.client.SchemaRegistryClient;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SchemaConsumerV1 {
+public class SchemaConsumerDevice {
 
-    public static final Logger logger = LoggerFactory.getLogger(SchemaConsumerV1.class.getName());
+    public static final Logger logger = LoggerFactory.getLogger(SchemaConsumerDevice.class.getName());
     public static void main(String[] args)  throws Exception {
-        if(args.length<1){
+        /*if(args.length<1){
             System.out.println("Configuration File Required.");
             System.exit(-1);
         }
-        String propertiesFile = args[0];
+        String propertiesFile = args[0];*/
+        String propertiesFile = "/Users/nandinin/Desktop/git/schema-registry-101-hogwarts/resources/configs/consumer_device.properties";//args[0];
 
         // Section 1: Get the configs from the properties file
         final ConfigUtil configUtil = new ConfigUtil(propertiesFile);
@@ -47,6 +49,8 @@ public class SchemaConsumerV1 {
         props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "true");
+        props.put(KafkaAvroSerde.KEY_SCHEMA_VERSION_ID_HEADER_NAME, "key.schema.version.id");
+        props.put(KafkaAvroSerde.VALUE_SCHEMA_VERSION_ID_HEADER_NAME, "device");
 
         // TODO: Section 2.0 : Key and Value deserializer class
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, LongDeserializer.class.getName());
